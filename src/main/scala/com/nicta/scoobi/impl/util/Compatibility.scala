@@ -8,6 +8,7 @@ import org.apache.hadoop.io.SequenceFile.Reader
 import org.apache.hadoop.fs.Options.Rename
 import java.net.URI
 import org.apache.hadoop.mapreduce.filecache.DistributedCache
+import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
 
 object Compatibility {
 
@@ -86,4 +87,68 @@ object Compatibility {
   }
 
 
+  def newTaskInputOutputContext(conf: Configuration, id: TaskAttemptID): TaskInputOutputContext[Any, Any, Any, Any] = {
+    val attemptId = id
+    val attemptContext = Compatibility.newTaskAttemptContext(conf, attemptId)
+
+    /**
+     * Limited implementation of a task input output context for use in memory
+     * It is essentially only safe to access the configuration and the job/task ids on this context
+     */
+    new TaskInputOutputContext[Any, Any, Any, Any] {
+      def nextKeyValue: Boolean = false
+      def getCurrentKey: Any = ()
+      def getCurrentValue: Any = ()
+      def write(key: Any, value: Any) {}
+      def getOutputCommitter = new FileOutputCommitter(null, attemptContext)
+      def getTaskAttemptID = attemptId
+      def setStatus(msg: String) {}
+      def getStatus: String = ""
+      def getProgress: Float = 0.0f
+      def getCounter(counterName: Enum[_]) = ???
+      def getCounter(groupName: String, counterName: String) = ???
+
+      def getArchiveClassPaths(): Array[org.apache.hadoop.fs.Path]                             = ???
+      def getArchiveTimestamps(): Array[String]                                                = ???
+      def getCacheArchives(): Array[java.net.URI]                                              = ???
+      def getCacheFiles(): Array[java.net.URI]                                                 = ???
+      def getCombinerClass(): Class[_ <: org.apache.hadoop.mapreduce.Reducer[_, _, _, _]]      = attemptContext.getCombinerClass()
+      def getConfiguration(): org.apache.hadoop.conf.Configuration                             = attemptContext.getConfiguration()
+      def getCredentials(): org.apache.hadoop.security.Credentials                             = attemptContext.getCredentials()
+      def getFileClassPaths(): Array[org.apache.hadoop.fs.Path]                                = ???
+      def getFileTimestamps(): Array[String]                                                   = ???
+      def getGroupingComparator(): org.apache.hadoop.io.RawComparator[_]                       = attemptContext.getGroupingComparator()
+      def getInputFormatClass(): Class[_ <: org.apache.hadoop.mapreduce.InputFormat[_, _]]     = attemptContext.getInputFormatClass()
+      def getJar(): String                                                                     = attemptContext.getJar()
+      def getJobID(): org.apache.hadoop.mapreduce.JobID                                        = attemptContext.getJobID()
+      def getJobName(): String                                                                 = attemptContext.getJobName()
+      def getJobSetupCleanupNeeded(): Boolean                                                  = ???
+      def getMapOutputKeyClass(): Class[_]                                                     = attemptContext.getMapOutputKeyClass()
+      def getMapOutputValueClass(): Class[_]                                                   = attemptContext.getMapOutputValueClass()
+      def getMapperClass(): Class[_ <: org.apache.hadoop.mapreduce.Mapper[_, _, _, _]]         = attemptContext.getMapperClass()
+      def getMaxMapAttempts(): Int                                                             = ???
+      def getMaxReduceAttempts(): Int                                                          = ???
+      def getNumReduceTasks(): Int                                                             = attemptContext.getNumReduceTasks()
+      def getOutputFormatClass(): Class[_ <: org.apache.hadoop.mapreduce.OutputFormat[_, _]]   = attemptContext.getOutputFormatClass()
+      def getOutputKeyClass(): Class[_]                                                        = attemptContext.getOutputKeyClass()
+      def getOutputValueClass(): Class[_]                                                      = attemptContext.getOutputValueClass()
+      def getPartitionerClass(): Class[_ <: org.apache.hadoop.mapreduce.Partitioner[_, _]]     = attemptContext.getPartitionerClass()
+      def getProfileEnabled(): Boolean                                                         = ???
+      def getProfileParams(): String                                                           = ???
+      def getReducerClass(): Class[_ <: org.apache.hadoop.mapreduce.Reducer[_, _, _, _]]       = attemptContext.getReducerClass()
+      def getSortComparator(): org.apache.hadoop.io.RawComparator[_]                           = attemptContext.getSortComparator()
+      def getUser(): String                                                                    = ???
+      def getWorkingDirectory(): org.apache.hadoop.fs.Path                                     = attemptContext.getWorkingDirectory()
+      def progress(): Unit                                                                     = attemptContext.progress()
+      // this methods are not defined on attempt context in CDH4
+      def getCombinerKeyGroupingComparator(): org.apache.hadoop.io.RawComparator[_]            = ???
+      def getLocalCacheArchives(): Array[org.apache.hadoop.fs.Path]                            = ???
+      def getLocalCacheFiles(): Array[org.apache.hadoop.fs.Path]                               = ???
+      def getProfileTaskRange(x$1: Boolean): org.apache.hadoop.conf.Configuration.IntegerRanges= ???
+      def getSymlink(): Boolean                                                                = ???
+      def getTaskCleanupNeeded(): Boolean                                                      = ???
+      def userClassesTakesPrecedence(): Boolean                                                = ???
+
+    }
+  }
 }

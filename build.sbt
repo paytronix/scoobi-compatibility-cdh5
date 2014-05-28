@@ -4,9 +4,9 @@ organization := "com.nicta"
 
 name := "scoobi-compatibility-cdh5"
 
-version := "1.0.1"
+version := "1.0.2"
 
-scalaVersion := "2.11.0"
+scalaVersion := "2.10.4"
 
 libraryDependencies ++= Seq("org.apache.hadoop" % "hadoop-client" % "2.2.0-cdh5.0.0-beta-2" exclude("asm", "asm"),
                             "org.apache.avro"   % "avro-mapred"   % "1.7.5-cdh5.0.0-beta-2")

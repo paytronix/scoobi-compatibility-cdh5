@@ -8,6 +8,8 @@ version := "1.0.3"
 
 scalaVersion := "2.10.4"
 
+crossScalaVersions := Seq("2.10.4", "2.11.2")
+
 libraryDependencies ++= Seq("org.apache.hadoop" % "hadoop-client" % "2.2.0-cdh5.0.0-beta-2" exclude("asm", "asm"),
                             "org.apache.avro"   % "avro-mapred"   % "1.7.5-cdh5.0.0-beta-2")
 

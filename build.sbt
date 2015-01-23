@@ -4,20 +4,30 @@ organization := "com.nicta"
 
 name := "scoobi-compatibility-cdh5"
 
-version := "1.0.3"
+version := "1.0.3-px-1"
 
 scalaVersion := "2.10.4"
 
 crossScalaVersions := Seq("2.10.4", "2.11.2")
 
-libraryDependencies ++= Seq("org.apache.hadoop" % "hadoop-client" % "2.2.0-cdh5.0.0-beta-2" exclude("asm", "asm"),
-                            "org.apache.avro"   % "avro-mapred"   % "1.7.5-cdh5.0.0-beta-2")
+resolvers += "Cloudera Maven Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
+
+libraryDependencies ++= Seq("org.apache.hadoop" % "hadoop-client" % "2.5.0-cdh5.2.1" exclude("asm", "asm"),
+                            "org.apache.avro"   % "avro-mapred"   % "1.7.6-cdh5.2.1")
+
+// publishTo <<= version { v: String =>
+//     val nexus = "https://oss.sonatype.org/"
+//     if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
+//     else                             Some("staging"   at nexus + "service/local/staging/deploy/maven2")
+//   }
 
 publishTo <<= version { v: String =>
-    val nexus = "https://oss.sonatype.org/"
-    if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
-    else                             Some("staging"   at nexus + "service/local/staging/deploy/maven2")
-  }
+  val nexus = "https://nexus.corp.paytronix.com/nexus/"
+  if (v.trim.endsWith("SNAPSHOT")) Some("paytronix-snapshots" at (nexus + "content/repositories/snapshots"))
+  else                             Some("paytronix-releases" at (nexus + "content/repositories/releases"))
+}
+
+credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
 publishMavenStyle := true
 
@@ -47,6 +57,6 @@ pomExtra := (
       </developers>
     )
 
-credentials := Seq(Credentials(Path.userHome / ".sbt" / "scoobi.credentials"))
+// credentials := Seq(Credentials(Path.userHome / ".sbt" / "scoobi.credentials"))
 
-sonatypeSettings
+// sonatypeSettings
